@@ -718,14 +718,13 @@ MonoBehaviour:
   m_text: 'Output Value
 
 
-    Distance
-
     Rotation X
 
     Rotation Y
 
-    Rotation
-    Z
+    Rotation Z
+
+    Distance
 
     Position
 
@@ -1838,31 +1837,18 @@ MonoBehaviour:
   m_text: 'Input Value
 
 
-    Up Note:
-
-    Down Note:
-
-    Right Note:
-
-    Left
-    Note:
-
-    Up_Left Note:
-
-    Up_Right Note:
-
-    Down_Left Note:
-
-    Down_Right
-    Note:
+    Note Direction:
 
     Distance:
 
     Energy:
 
-    Rotation x:
+    Rotation
+    x:
 
-    Rotation y:'
+    Rotation y:
+
+    Rotation z:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2788,22 +2774,22 @@ MonoBehaviour:
   NoteCount: 5
   NoteDirection: 8
   BeforeAngleDifficulty: 1
-  AfterAngleIsNeeded: 0
-  AfterAngleDifficulty: 30
+  AfterAngleIsNeeded: 1
+  AfterAngleDifficulty: 10
   PointsAddedForEachNote: 100
   TotalPointsNeeded: 500
   PopulationSize: 100
-  SaberEnergy: 300
+  SaberEnergy: 150
   SaberXAsRotationEnabled: 1
   SaberYAsRotationEnabled: 1
-  SaberZAsRotationEnabled: 0
+  SaberZAsRotationEnabled: 1
   SaberPostitionEnabled: 0
   RandomNoteForEveryPlatform: 1
   MutationChance: 0.057
   MutationStrength: 0.307
   ShouldIncreaseNoteCountAutomaticaly: 0
   ShouldLowerMutationAutomaticaly: 1
-  Gamespeed: 11
+  Gamespeed: 11.2
   UseSaveFile: 0
   LogNeuralNetwork: 1
   DebugsEnabled: 1

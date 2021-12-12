@@ -24,6 +24,8 @@ public class Saber : MonoBehaviour
 
     private bool goalIsReached = false;
 
+    private int pointsForStayingAlive = 0;
+
     private Manager manager;
 
     private bool hasNoteBeenHitCorrectly = false;
@@ -43,12 +45,16 @@ public class Saber : MonoBehaviour
     void FixedUpdate()
     {
         //If the saber runs out of energy, it needs to learn more 
+        if (SaberRanOutOfEnergy) return;
         if (IsOutOfEnergy())
         {
             NeedToLearnMore();
             SaberRanOutOfEnergy = true;
+            GiveRewards(pointsForStayingAlive / 10);
             return;
         }
+
+        pointsForStayingAlive++;
         
 
         //Checks if the BeforeAngle has been correctly
@@ -69,9 +75,9 @@ public class Saber : MonoBehaviour
             }
             else
             {
-                Reset();
-                GiveRewards();
+                Reset();               
             }
+                 
         }
 
 
@@ -125,6 +131,7 @@ public class Saber : MonoBehaviour
             if (!goalIsReached)
             {
                 if (manager.DebugsEnabled) Debug.Log("Goal Reached!");
+                
                 goalIsReached = true;
             }            
         }
@@ -145,36 +152,42 @@ public class Saber : MonoBehaviour
         // Does the ray intersect any objects excluding the player layer
         if (Physics.Raycast(transform.position, new Vector3(0.0f, 0.0f, -1.0f), out hit, 20, layer))
         {
+            input[0] = (1f / 8f) * ((float)UpcommingNoteDirection + 1f);           
 
-            if (UpcommingNoteDirection == Note.NoteDirections.up) input[0] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.down) input[1] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.right) input[2] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.left) input[3] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.up_left) input[4] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.up_right) input[5] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.down_left) input[6] = 1 / hit.distance;
-            if (UpcommingNoteDirection == Note.NoteDirections.down_right) input[7] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.up) input[0] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.down) input[0] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.right) input[0] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.left) input[0] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.up_left) input[0] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.up_right) input[5] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.down_left) input[6] = 1 / hit.distance;
+            //if (UpcommingNoteDirection == Note.NoteDirections.down_right) input[7] = 1 / hit.distance;
 
-            input[8] = 1 / ((hit.distance * 0.5) < 1 ? 1 : hit.distance);
+            input[1] = 1 / ((hit.distance * 0.5) < 1 ? 1 : hit.distance);
             
             if (manager.DebugsEnabled) Debug.DrawRay(transform.position, new Vector3(0.0f, 0.0f, -1.0f) * hit.distance, Color.yellow);
         }
         else
         {
             if(manager.DebugsEnabled) Debug.DrawRay(transform.position, new Vector3(0.0f, 0.0f, -1.0f) * 1000, Color.white);
-            input[8] = 0;//if nothing is detected, will return 0 to network                
+            input[0] = 0;
+            input[1] = 0;//if nothing is detected, will return 0 to network                
         }
 
 
-        var energyInput = Mathf.Round(energy / 10);
-        if (energyInput < 1) energyInput = 1;
-        input[9] = 1 / energyInput;
+        var energyInput = energy == 0 ? 0f : (1f / (float) manager.SaberEnergy) * energy;
+        input[2] = energyInput;
 
-        var rotationX = 1 / (transform.rotation.x + 2);
-        var rotationY = 1 / (transform.rotation.y + 2);
+        var rotationX = transform.rotation.x;
+        var rotationY = transform.rotation.y;
+        var rotationZ = transform.rotation.z;
+        
+        //Debug.Log($"input: {transform.rotation.x} | {transform.rotation.y} | {transform.rotation.z}");
 
-        //input[10] = rotationX;
-        //input[11] = rotationY;
+        input[3] = rotationX;
+        input[4] = rotationY;
+        input[5] = rotationZ;
+       
 
         //Debug.Log($"up: {input[0]} down: {input[1]} right: {input[2]} left: {input[3]} none: {input[4]}");
 
@@ -197,6 +210,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -211,6 +225,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -225,6 +240,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -239,6 +255,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -253,6 +270,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -267,6 +285,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -281,6 +300,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -295,6 +315,7 @@ public class Saber : MonoBehaviour
                 //Check if the saber is hitting the note forwards
                 if ((transform.position.z + 10) - (saberTip.position.z + 10) > 0)
                 {
+                    GiveRewards(manager.PointsAddedForEachNote / 10);
                     hasNoteBeenHitCorrectly = true;
                     lastHitPosition = saberTip.position;
                 }
@@ -399,7 +420,8 @@ public class Saber : MonoBehaviour
                 if ((lastHitPosition.y + 10) - (transform.Find("SaberTip").position.y + 10) > (2f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -409,7 +431,8 @@ public class Saber : MonoBehaviour
                 if ((transform.Find("SaberTip").position.y + 10) - (lastHitPosition.y + 10) > (2f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
             //RIGHT
@@ -418,7 +441,8 @@ public class Saber : MonoBehaviour
                 if ((transform.Find("SaberTip").position.x + 10) - (lastHitPosition.x + 10) > (2f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -428,7 +452,8 @@ public class Saber : MonoBehaviour
                 if ((lastHitPosition.x + 10) - (transform.Find("SaberTip").position.x + 10) > (2f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -440,7 +465,8 @@ public class Saber : MonoBehaviour
                 if (differencey > 1.5f && differencex > (1.5f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -452,7 +478,8 @@ public class Saber : MonoBehaviour
                 if (differencey > 1.5f && differencex > (1.5f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -464,7 +491,8 @@ public class Saber : MonoBehaviour
                 if (differencey > 1.5f && differencex > (1.5f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
 
@@ -476,17 +504,17 @@ public class Saber : MonoBehaviour
                 if (differencey > 1.5f && differencex > (1.5f / difficulty))
                 {
                     Reset();
-                    GiveRewards();
+                    GiveRewards(manager.PointsAddedForEachNote);
+                    energy = manager.SaberEnergy;
                 }
             }
         }
     }
 
-    private void GiveRewards()
+    private void GiveRewards(int points = 0)
     {      
-        AddPoints(manager.PointsAddedForEachNote);
-        if (manager.DebugsEnabled) Debug.Log($"Points added! Total points: {totalPoints}");
-        energy = manager.SaberEnergy;
+        AddPoints(points);
+        if (manager.DebugsEnabled) Debug.Log($"Points added! Total points: {totalPoints}");        
     }
 
     public void AddPoints(int points)

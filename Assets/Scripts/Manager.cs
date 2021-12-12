@@ -44,7 +44,7 @@ public class Manager : MonoBehaviour
     public bool DebugsEnabled;
 
     private List<NeuralNetworkDFF> networks;
-    private int[] layers = new int[4] { 10, 16, 12, /*13, 13, 16, 16, 12, 12, 8, 8,*/ 2 };//initializing network to the right size
+    private int[] layers = new int[4] { 6, 16, 12, /*13, 13, 16, 16, 12, 12, 8, 8,*/ 3 };//initializing network to the right size
     private List<Saber> sabers;
     private List<Note> notes;
 
