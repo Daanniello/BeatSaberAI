@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
+using System.Linq;
 
 public class Manager : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class Manager : MonoBehaviour
     [Range(0, 8)] public int NoteDirection = 0;
     [Range(50f, 0f)] public float BeforeAngleDifficulty = 1f;
     public bool AfterAngleIsNeeded;
-    [Range(50f, 0f)] public float AfterAngleDifficulty = 1f;    
+    [Range(50f, 0f)] public float AfterAngleDifficulty = 1f;
     private int fixedNoteCount = 0;
 
     public int PointsAddedForEachNote;
@@ -44,7 +46,8 @@ public class Manager : MonoBehaviour
     public bool DebugsEnabled;
 
     private List<NeuralNetworkDFF> networks;
-    private int[] layers = new int[4] { 6, 16, 12, /*13, 13, 16, 16, 12, 12, 8, 8,*/ 3 };//initializing network to the right size
+    //https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3
+    private int[] layers = new int[4] { 2, 5, 5, /*12, 16, 16, 12, 12, 8, 8,*/ 4 };//initializing network to the right size
     private List<Saber> sabers;
     private List<Note> notes;
 
@@ -57,7 +60,7 @@ public class Manager : MonoBehaviour
     {
         InitNetworks();
         MutationChance = 0.05f;
-        MutationStrength = 0.035f;
+        MutationStrength = 0.1f;
 
     }
 
@@ -90,7 +93,7 @@ public class Manager : MonoBehaviour
             else
             {
                 net.Load("Assets/Pre-trained.txt");//on start load the network save
-            }            
+            }
             networks.Add(net);
         }
     }
@@ -108,19 +111,20 @@ public class Manager : MonoBehaviour
             }
 
             var successCount = 0;
-            var highestFitness = 0;
+            var highestFitness = sabers.Max(x => x.totalPoints);
+            var averageFitness = sabers.Average(x => x.totalPoints);
             for (int i = 0; i < sabers.Count; i++)
             {
                 if (sabers[i] != null)
                 {
                     if (sabers[i].totalPoints >= TotalPointsNeeded) successCount += 1;
-                    if (sabers[i].totalPoints > highestFitness) highestFitness = sabers[i].totalPoints;
                     GameObject.Destroy(sabers[i].gameObject);//if there are Prefabs in the scene this will get rid of them
                 }
             }
 
             GameObject.Find("SuccessRate").GetComponent<TMPro.TextMeshPro>().SetText($"Success Rate: {(successCount * 100) / sabers.Count}%    {successCount}/{sabers.Count}");
             GameObject.Find("Fitness").GetComponent<TMPro.TextMeshPro>().SetText($"Highest Fitness: {highestFitness}");
+            GameObject.Find("AvgFitness").GetComponent<TMPro.TextMeshPro>().SetText($"Average Fitness: {averageFitness}");
 
             //To make learning go faster. Let them change a lot until the first one gets a success
             //Then change the mutation rate to a low number
@@ -150,18 +154,20 @@ public class Manager : MonoBehaviour
         sabers = new List<Saber>();
         notes = new List<Note>();
         var randomNote = Random.Range(0, 8);
+
+
         for (int i = 0; i < PopulationSize; i++)
         {
-            
+
             Saber rightSaber = (Instantiate(RightSaberPrefab, new Vector3(i * platformDistance, 1.6f, 0), transform.rotation * Quaternion.Euler(0f, 0f, 0f))).GetComponent<Saber>();
             rightSaber.network = networks[i];//deploys network to each learner
             rightSaber.id = i + 1;
 
 
-            
-            AddNotes(NoteCount);            
+
+            AddNotes(NoteCount);
             void AddNotes(int noteCount)
-            {                
+            {
                 for (var x = 1; x <= noteCount; x++)
                 {
                     if (RandomNoteForEveryPlatform) randomNote = Random.Range(0, 8);

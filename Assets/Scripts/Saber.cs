@@ -111,20 +111,16 @@ public class Saber : MonoBehaviour
         if (totalPoints < manager.TotalPointsNeeded)
         {
             var output = NeedToLearnMore();
-            //Debug.Log($"up: {output[0]} down: {output[1]} right: {output[2]} left:{output[3]}");
 
-            //Output 0: swing up direction if note is close 
-            //Output 1: swing down direction if note is close 
-            //Output 2: swing right direction if note is close 
-            //Output 3: swing left direction if note is close 
-            //Output 4: Dont swing if note is far away 
             var xAsRotation = manager.SaberXAsRotationEnabled ? output[0] * 90 : 0;
             var yAsRotation = manager.SaberYAsRotationEnabled ? output[1] * 90 : 0;
             var zAsRotation = manager.SaberZAsRotationEnabled ? output[2] * 90 : 0;
-            transform.Rotate(xAsRotation * Time.deltaTime, yAsRotation * Time.deltaTime, zAsRotation * Time.deltaTime);
-            //Debug.Log(output[2]);
-            var positionChange = manager.SaberPostitionEnabled ? this.transform.right * output[3] : new Vector3(0, 0, 0);
-            transform.position += positionChange;
+            var speed = output[3] * 10;
+            transform.Rotate(xAsRotation * (Time.deltaTime * speed), yAsRotation * (Time.deltaTime * speed), zAsRotation * (Time.deltaTime * speed));
+            
+
+            //var positionChange = manager.SaberPostitionEnabled ? this.transform.right * output[3] : new Vector3(0, 0, 0);
+            //transform.position += positionChange;
         }
         else
         {
@@ -174,20 +170,25 @@ public class Saber : MonoBehaviour
             input[1] = 0;//if nothing is detected, will return 0 to network                
         }
 
+        //ONLY VISUAL INPUT IN THE NETWORK IS IMPORTANT
+        //THE NETWORK DOESNT LEARN BY THINKING BACK ABOUT PREVIOUS MOVEMENTS
 
+        //---------------------------------Energy Input----------------------------------------------
         var energyInput = energy == 0 ? 0f : (1f / (float) manager.SaberEnergy) * energy;
-        input[2] = energyInput;
+        //input[2] = energyInput;
+        //-------------------------------------------------------------------------------------------
 
-        var rotationX = transform.rotation.x;
-        var rotationY = transform.rotation.y;
-        var rotationZ = transform.rotation.z;
-        
-        //Debug.Log($"input: {transform.rotation.x} | {transform.rotation.y} | {transform.rotation.z}");
 
-        input[3] = rotationX;
-        input[4] = rotationY;
-        input[5] = rotationZ;
-       
+        //--------------------------------Rotations Input--------------------------------------------
+        //var rotationX = transform.rotation.x;
+        //var rotationY = transform.rotation.y;
+        //var rotationZ = transform.rotation.z;
+
+        //input[3] = rotationX;
+        //input[4] = rotationY;
+        //input[5] = rotationZ;
+        //-------------------------------------------------------------------------------------------
+
 
         //Debug.Log($"up: {input[0]} down: {input[1]} right: {input[2]} left: {input[3]} none: {input[4]}");
 
