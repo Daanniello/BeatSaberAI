@@ -6,6 +6,11 @@ using System.Linq;
 
 public class Manager : MonoBehaviour
 {
+    //  Websites info
+    //https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3
+    //https://www.v7labs.com/blog/neural-networks-activation-functions#choose-activation-function
+
+
     //Prefabs
     public GameObject NotePrefab;
     public GameObject LeftSaberPrefab;
@@ -46,8 +51,8 @@ public class Manager : MonoBehaviour
     public bool DebugsEnabled;
 
     private List<NeuralNetworkDFF> networks;
-    //https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3
     private int[] layers = new int[4] { 2, 5, 5, /*12, 16, 16, 12, 12, 8, 8,*/ 4 };//initializing network to the right size
+    public NeuralNetworkDFF.activationEnum[] activations = new NeuralNetworkDFF.activationEnum[3] { NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh }; //Giving the actions for the hidden layers and output layer
     private List<Saber> sabers;
     private List<Note> notes;
 
@@ -85,7 +90,7 @@ public class Manager : MonoBehaviour
         networks = new List<NeuralNetworkDFF>();
         for (int i = 0; i < PopulationSize; i++)
         {
-            NeuralNetworkDFF net = new NeuralNetworkDFF(layers);
+            NeuralNetworkDFF net = new NeuralNetworkDFF(layers, activations);
             if (UseSaveFile)
             {
                 net.Load("Assets/Save.txt");//on start load the network save
@@ -198,7 +203,7 @@ public class Manager : MonoBehaviour
         networks[PopulationSize - 1].Save("Assets/Save.txt");//saves networks weights and biases to file, to preserve network performance
         for (int i = 0; i < PopulationSize / 2; i++)
         {
-            networks[i] = networks[i + PopulationSize / 2].copy(new NeuralNetworkDFF(layers));
+            networks[i] = networks[i + PopulationSize / 2].copy(new NeuralNetworkDFF(layers, activations));
             networks[i].Mutate((int)(1 / MutationChance), MutationStrength);
         }
     }

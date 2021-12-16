@@ -9,12 +9,13 @@ public class NeuralNetworkDFF : IComparable<NeuralNetworkDFF>
     private float[][] neurons;//neurons
     private float[][] biases;//biasses
     private float[][][] weights;//weights
-    private int[] activations;//layers
+    private activationEnum[] activations;//layers
 
     public float fitness = 0;//fitness
 
-    public NeuralNetworkDFF(int[] layers)
+    public NeuralNetworkDFF(int[] layers, activationEnum[] activations)
     {
+        this.activations = activations;
         this.layers = new int[layers.Length];
         for (int i = 0; i < layers.Length; i++)
         {
@@ -74,6 +75,7 @@ public class NeuralNetworkDFF : IComparable<NeuralNetworkDFF>
 
     public float[] FeedForward(float[] inputs, bool shouldLog = false)//feed forward, inputs >==> outputs.
     {
+        //Giving the input layer's neurons their values
         for (int i = 0; i < inputs.Length; i++)
         {
             neurons[0][i] = inputs[i];
@@ -81,14 +83,20 @@ public class NeuralNetworkDFF : IComparable<NeuralNetworkDFF>
         for (int i = 1; i < layers.Length; i++)
         {
             int layer = i - 1;
+
+            //Foreach layer after the input layer
             for (int j = 0; j < neurons[i].Length; j++)
             {
                 float value = 0f;
+
+                //Calculate the value for the neurons in the hidden and output layer
                 for (int k = 0; k < neurons[i - 1].Length; k++)
                 {
                     value += weights[i - 1][j][k] * neurons[i - 1][k];
                 }
-                neurons[i][j] = activate(value + biases[i][j]);
+
+                //Activate the values with biases for each neuron
+                neurons[i][j] = activate(value + biases[i][j], activations[i - 1]);
             }
         }
 
@@ -125,9 +133,75 @@ public class NeuralNetworkDFF : IComparable<NeuralNetworkDFF>
         return neurons[neurons.Length - 1];
     }
 
-    public float activate(float value)
+    public float activate(float value, activationEnum activation)
     {
-        return (float)Math.Tanh(value);
+        switch (activation)
+        {
+            case activationEnum.sigmoid:
+                return sigmoid(value);
+            case activationEnum.tanh:
+                return tanh(value);
+            case activationEnum.relu:
+                return relu(value);
+            case activationEnum.leakyrelu:
+                return leakyrelu(value);
+            case activationEnum.sigmoidDer:
+                return sigmoidDer(value);
+            case activationEnum.tanhDer:
+                return tanhDer(value);
+            case activationEnum.reluDer:
+                return reluDer(value);
+            case activationEnum.leakyreluDer:
+                return leakyreluDer(value);
+            default:
+                return (float)Math.Tanh(value);
+        }
+    }
+
+    public float sigmoid(float x)//activation functions and their corrosponding derivatives
+    {
+        float k = (float)Math.Exp(x);
+        return k / (1.0f + k);
+    }
+    public float tanh(float x)
+    {
+        return (float)Math.Tanh(x);
+    }
+    public float relu(float x)
+    {
+        return (0 >= x) ? 0 : x;
+    }
+    public float leakyrelu(float x)
+    {
+        return (0 >= x) ? 0.01f * x : x;
+    }
+    public float sigmoidDer(float x)
+    {
+        return x * (1 - x);
+    }
+    public float tanhDer(float x)
+    {
+        return 1 - (x * x);
+    }
+    public float reluDer(float x)
+    {
+        return (0 >= x) ? 0 : 1;
+    }
+    public float leakyreluDer(float x)
+    {
+        return (0 >= x) ? 0.01f : 1;
+    }
+
+    public enum activationEnum
+    {
+        sigmoid,
+        tanh,
+        relu,
+        leakyrelu,
+        sigmoidDer,
+        tanhDer,
+        reluDer,
+        leakyreluDer
     }
 
     public void Mutate(int chance, float val)//used as a simple mutation function for any genetic implementations.
