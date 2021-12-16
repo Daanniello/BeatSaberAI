@@ -115,8 +115,8 @@ public class Saber : MonoBehaviour
             var xAsRotation = manager.SaberXAsRotationEnabled ? output[0] * 90 : 0;
             var yAsRotation = manager.SaberYAsRotationEnabled ? output[1] * 90 : 0;
             var zAsRotation = manager.SaberZAsRotationEnabled ? output[2] * 90 : 0;
-            var speed = output[3] * 10;
-            transform.Rotate(xAsRotation * (Time.deltaTime * speed), yAsRotation * (Time.deltaTime * speed), zAsRotation * (Time.deltaTime * speed));
+            //var speed = output[3] * 10;
+            transform.Rotate(xAsRotation * (Time.deltaTime), yAsRotation * (Time.deltaTime), zAsRotation * (Time.deltaTime));
             
 
             //var positionChange = manager.SaberPostitionEnabled ? this.transform.right * output[3] : new Vector3(0, 0, 0);
@@ -148,7 +148,7 @@ public class Saber : MonoBehaviour
         // Does the ray intersect any objects excluding the player layer
         if (Physics.Raycast(transform.position, new Vector3(0.0f, 0.0f, -1.0f), out hit, 20, layer))
         {
-            input[0] = (1f / 8f) * ((float)UpcommingNoteDirection + 1f);           
+            input[0] = (1f / 8f) * ((float)UpcommingNoteDirection + 1f);
 
             //if (UpcommingNoteDirection == Note.NoteDirections.up) input[0] = 1 / hit.distance;
             //if (UpcommingNoteDirection == Note.NoteDirections.down) input[0] = 1 / hit.distance;
@@ -159,7 +159,8 @@ public class Saber : MonoBehaviour
             //if (UpcommingNoteDirection == Note.NoteDirections.down_left) input[6] = 1 / hit.distance;
             //if (UpcommingNoteDirection == Note.NoteDirections.down_right) input[7] = 1 / hit.distance;
 
-            input[1] = 1 / ((hit.distance * 0.5) < 1 ? 1 : hit.distance);
+
+            input[1] = hit.distance / (1.0f + hit.distance);
             
             if (manager.DebugsEnabled) Debug.DrawRay(transform.position, new Vector3(0.0f, 0.0f, -1.0f) * hit.distance, Color.yellow);
         }

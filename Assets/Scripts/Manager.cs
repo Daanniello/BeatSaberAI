@@ -13,46 +13,47 @@ public class Manager : MonoBehaviour
 
     //Prefabs
     public GameObject NotePrefab;
-    public GameObject LeftSaberPrefab;
+    private GameObject LeftSaberPrefab;
     public GameObject RightSaberPrefab;
     public GameObject Platform;
 
     //In-game effects
-    [Range(1, 20)] public int NoteCount = 1;
-    [Range(0, 8)] public int NoteDirection = 0;
+    [Range(1, 20)] public int NoteCount = 5;
+    [Range(0, 8)] public int NoteDirection = 8;
     [Range(50f, 0f)] public float BeforeAngleDifficulty = 1f;
-    public bool AfterAngleIsNeeded;
+    public bool AfterAngleIsNeeded = true;
     [Range(50f, 0f)] public float AfterAngleDifficulty = 1f;
     private int fixedNoteCount = 0;
 
-    public int PointsAddedForEachNote;
-    public float TotalPointsNeeded;
-    public int PopulationSize;
+    public int PointsAddedForEachNote = 100;
+    public float TotalPointsNeeded = 500;
+    public int PopulationSize = 50;
     public int SaberEnergy = 300;
-    public bool SaberXAsRotationEnabled;
-    public bool SaberYAsRotationEnabled;
-    public bool SaberZAsRotationEnabled;
+    public bool SaberXAsRotationEnabled = true;
+    public bool SaberYAsRotationEnabled = true;
+    public bool SaberZAsRotationEnabled = true;
     public bool SaberPostitionEnabled;
-    public bool RandomNoteForEveryPlatform;
+    public bool RandomNoteForEveryPlatform = true;
+    public bool RandomNoteSequence = true;
 
-    [Range(0.0001f, 1f)] public float MutationChance = 0.01f;
-    [Range(0f, 1f)] public float MutationStrength = 0.5f;
+    [Range(0.0001f, 1f)] public float MutationChance = 0.05f;
+    [Range(0f, 1f)] public float MutationStrength = 0.1f;
 
     //Tools
     public bool ShouldIncreaseNoteCountAutomaticaly;
-    public bool ShouldLowerMutationAutomaticaly;
+    public bool ShouldLowerMutationAutomaticaly = true;
 
     //Efficiency
-    [Range(0.1f, 30f)] public float Gamespeed = 1f;
+    [Range(0.1f, 30f)] public float Gamespeed = 10f;
 
     //OI
     public bool UseSaveFile;
-    public bool LogNeuralNetwork;
+    public bool LogNeuralNetwork = true;
     public bool DebugsEnabled;
 
     private List<NeuralNetworkDFF> networks;
-    private int[] layers = new int[4] { 2, 5, 5, /*12, 16, 16, 12, 12, 8, 8,*/ 4 };//initializing network to the right size
-    public NeuralNetworkDFF.activationEnum[] activations = new NeuralNetworkDFF.activationEnum[3] { NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh }; //Giving the actions for the hidden layers and output layer
+    public int[] layers = new int[5] { 2, 5, 5, 5, /*12, 16, 16, 12, 12, 8, 8,*/ 3 };//initializing network to the right size
+    public NeuralNetworkDFF.activationEnum[] activations = new NeuralNetworkDFF.activationEnum[4] { NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh, NeuralNetworkDFF.activationEnum.tanh }; //Giving the actions for the hidden layers and output layer
     private List<Saber> sabers;
     private List<Note> notes;
 
@@ -173,9 +174,9 @@ public class Manager : MonoBehaviour
             AddNotes(NoteCount);
             void AddNotes(int noteCount)
             {
+                if (RandomNoteForEveryPlatform) randomNote = Random.Range(0, 8);
                 for (var x = 1; x <= noteCount; x++)
-                {
-                    if (RandomNoteForEveryPlatform) randomNote = Random.Range(0, 8);
+                {                    
                     Note note = (Instantiate(NotePrefab, new Vector3((i * platformDistance)/* - Random.Range(-3, 3)*/, 1.6f, x * -25), transform.rotation * Quaternion.Euler(0f, 0f, 0f))).GetComponent<Note>();
                     if (NoteDirection != 8)
                     {
@@ -183,7 +184,8 @@ public class Manager : MonoBehaviour
                     }
                     else
                     {
-                        note.SetNotePositionAndDirection(Note.NotePositions.LowerMiddleLeft, (Note.NoteDirections)randomNote);
+                        if(RandomNoteSequence) note.SetNotePositionAndDirection(Note.NotePositions.LowerMiddleLeft, (Note.NoteDirections)Random.Range(0, 8));
+                        else note.SetNotePositionAndDirection(Note.NotePositions.LowerMiddleLeft, (Note.NoteDirections)randomNote);
                     }
                     notes.Add(note);
                 }

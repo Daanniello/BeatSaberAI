@@ -2769,31 +2769,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NotePrefab: {fileID: 916112557765460025, guid: 379b553ac265ac243910485066cd6ffc, type: 3}
-  LeftSaberPrefab: {fileID: 0}
   RightSaberPrefab: {fileID: 4300568193019295507, guid: f5af2aac212ae7d40a35df2205c67e42, type: 3}
   Platform: {fileID: 6427846707688094202, guid: f8c0d282218eeb344a548e9d785bf8ba, type: 3}
-  NoteCount: 5
-  NoteDirection: 0
+  NoteCount: 3
+  NoteDirection: 8
   BeforeAngleDifficulty: 1
   AfterAngleIsNeeded: 1
   AfterAngleDifficulty: 1
   PointsAddedForEachNote: 100
-  TotalPointsNeeded: 500
+  TotalPointsNeeded: 300
   PopulationSize: 100
   SaberEnergy: 300
   SaberXAsRotationEnabled: 1
   SaberYAsRotationEnabled: 1
   SaberZAsRotationEnabled: 1
   SaberPostitionEnabled: 0
-  RandomNoteForEveryPlatform: 1
-  MutationChance: 0.057
-  MutationStrength: 0.307
+  RandomNoteForEveryPlatform: 0
+  MutationChance: 0.05
+  MutationStrength: 0.1
   ShouldIncreaseNoteCountAutomaticaly: 0
   ShouldLowerMutationAutomaticaly: 1
-  Gamespeed: 11.2
+  Gamespeed: 10
   UseSaveFile: 0
   LogNeuralNetwork: 1
   DebugsEnabled: 0
+  layers: 0200000005000000050000000500000003000000
+  activations: 01000000010000000100000001000000
 --- !u!4 &1555899705
 Transform:
   m_ObjectHideFlags: 0
