@@ -123,7 +123,7 @@ public class Saber : MonoBehaviour
             //transform.position += positionChange;
         }
         else
-        {
+        {            
             if (!goalIsReached)
             {
                 if (manager.DebugsEnabled) Debug.Log("Goal Reached!");

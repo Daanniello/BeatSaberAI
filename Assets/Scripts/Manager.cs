@@ -134,12 +134,14 @@ public class Manager : MonoBehaviour
 
             //To make learning go faster. Let them change a lot until the first one gets a success
             //Then change the mutation rate to a low number
+            //This is important because otherwise the right movements could be dominated by other mutations again and it will take way longer to learn perfection
+            //Also check if the goal is at the right amount 
             if (ShouldLowerMutationAutomaticaly)
             {
-                if (successCount != 0 && MutationChance == 0.8f)
+                if (successCount != 0)
                 {
-                    MutationChance = 0.01f;
-                    MutationStrength = 0.065f;
+                    MutationChance = 0.5f;
+                    MutationStrength = 0.02f;
                 }
             }
             if (((successCount * 100) / sabers.Count) > 90 && ShouldIncreaseNoteCountAutomaticaly)
